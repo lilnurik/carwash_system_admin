@@ -1,0 +1,15 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+psycopg2-binary==2.9.9
+requests==2.31.0
+Werkzeug==2.3.7
+python-dotenv==1.1.0
+gunicorn==20.1.0
+flask-socketio==5.1.1   # Add this line for Socket.IO support
+eventlet==0.33.0
+
+gevent==21.12.0
+gevent-websocket==0.10.1
+dnspython==2.2.1
+

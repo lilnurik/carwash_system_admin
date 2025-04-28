@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>If you can see this, basic rendering is working</h1>
+    <p>Current time: {{ datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>Current user: {{ os.environ.get('CURRENT_USER', 'system') }}</p>
+</body>
+</html>

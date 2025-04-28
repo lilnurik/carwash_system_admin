@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>WebSocket Test</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            Socket.IO Status: <span id="status">Disconnected</span>
+        </div>
+
+        <div class="mb-3">
+            <label for="message" class="form-label">Test Message</label>
+            <input type="text" class="form-control" id="message" placeholder="Type a message...">
+        </div>
+        <button id="send" class="btn btn-primary">Send</button>
+
+        <hr>
+
+        <h4>Messages</h4>
+        <div id="messages" class="p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+            <p><em>Waiting for messages...</em></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+<script>
+    // Connect to Socket.IO server
+    const socket = io();
+    const status = document.getElementById('status');
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+
+    // Connection events
+    socket.on('connect', () => {
+        status.textContent = 'Connected';
+        status.classList.add('text-success');
+        status.classList.remove('text-danger');
+        addMessage('System', 'Connected to server');
+
+        // Join a room
+        socket.emit('join', {
+            username: 'WebTester',
+            room: 'test'
+        });
+    });
+
+    socket.on('disconnect', () => {
+        status.textContent = 'Disconnected';
+        status.classList.add('text-danger');
+        status.classList.remove('text-success');
+        addMessage('System', 'Disconnected from server');
+    });
+
+    // Message events
+    socket.on('server_message', (data) => {
+        addMessage('Server', data.message, data.timestamp);
+    });
+
+    socket.on('message', (data) => {
+        addMessage(data.user, data.message, data.timestamp);
+    });
+
+    // Handle balance updates
+    socket.on('balance_update', (data) => {
+        addMessage('Balance Update',
+            `User ${data.user_id} (Card: ${data.rfid_card_number}) balance updated to ${data.new_balance}`,
+            data.timestamp);
+    });
+
+    // Send button click
+    sendButton.addEventListener('click', () => {
+        const message = messageInput.value.trim();
+        if (message) {
+            socket.emit('message', {
+                username: 'WebTester',
+                message: message,
+                room: 'test'
+            });
+            messageInput.value = '';
+        }
+    });
+
+    // Enter key in input
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendButton.click();
+        }
+    });
+
+    // Helper function to add messages to the UI
+    function addMessage(sender, text, timestamp = null) {
+        const time = timestamp || new Date().toISOString();
+        const messageElement = document.createElement('p');
+        messageElement.innerHTML = `<strong>${sender}</strong> <small class="text-muted">${time}</small>: ${text}`;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        // Remove the "waiting for messages" text if it's the first message
+        if (messagesDiv.getElementsByTagName('em').length > 0) {
+            messagesDiv.innerHTML = '';
+            messagesDiv.appendChild(messageElement);
+        }
+    }
+</script>
+{% endblock %}

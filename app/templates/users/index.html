@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2>Users</h2>
+            <a href="{{ url_for('users.create') }}" class="btn btn-primary">Add User</a>
+        </div>
+
+        <!-- Search and Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="GET" action="{{ url_for('users.index') }}" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search users..."
+                               value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>
+                            Active
+                        </option>
+                        <option value="inactive" {% if request.args.get('status') == 'inactive' %}selected{% endif %}>
+                            Inactive
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="balance" class="form-select">
+                        <option value="">All Balances</option>
+                        <option value="positive" {% if request.args.get('balance') == 'positive' %}selected{% endif %}>
+                            Positive
+                        </option>
+                        <option value="zero" {% if request.args.get('balance') == 'zero' %}selected{% endif %}>Zero
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ url_for('users.index') }}" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                </div>
+            </form>
+            <!-- Add this right after the search form -->
+            <div class="mt-2">
+                <p class="text-muted mb-0">
+                    Found {{ users|length }} user(s)
+                    {% if request.args.get('search') or request.args.get('status') or request.args.get('balance') %}
+                        with applied filters
+                        <a href="{{ url_for('users.index') }}" class="text-decoration-none">
+                            <i class="bi bi-x-circle"></i> Clear all filters
+                        </a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Users List -->
+        <div class="card-body">
+            {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>RFID Card</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.rfid_card_number }}</td>
+                                <td>{{ user.balance }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('users.edit', id=user.id) }}"
+                                           class="btn btn-primary">Edit</a>
+                                        <form action="{{ url_for('users.toggle_status', id=user.id) }}" method="POST"
+                                              class="d-inline">
+                                            <!-- Add CSRF token here -->
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            <button type="submit" class="btn btn-warning">
+                                                {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('users.delete', id=user.id) }}" method="POST"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <!-- Add CSRF token here -->
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">No users found. <a href="{{ url_for('users.create') }}">Add one now</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

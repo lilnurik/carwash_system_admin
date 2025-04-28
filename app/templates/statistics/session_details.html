@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Session Details</h1>
+        <a href="{{ url_for('statistics.index') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Statistics
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Session ID:</strong> {{ session.session_id }}</p>
+                            <p><strong>Kiosk ID:</strong> {{ session.kiosk_id }}</p>
+                            <p><strong>Duration:</strong> {{ session.duration_seconds|round(2) }} seconds</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Ended At:</strong> {{ session.ended_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p><strong>Created At:</strong> {{ session.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>Financial Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-3">
+                        <div class="row text-center">
+                            <div class="col">
+                                <p class="mb-0"><strong>Total Inserted</strong></p>
+                                <h3>${{ session.total_inserted }}</h3>
+                            </div>
+                            <div class="col">
+                                <p class="mb-0"><strong>Total Consumed</strong></p>
+                                <h3>${{ session.total_consumed }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <p><strong>Final Balance:</strong> ${{ session.final_balance }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if session.payment_details %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in session.payment_details %}
+                                    <tr>
+                                        <td>{{ payment.type }}</td>
+                                        <td>${{ payment.amount }}</td>
+                                        <td>{{ payment.timestamp }}</td>
+                                        <td>
+                                            {% if payment.status == 'success' %}
+                                                <span class="badge bg-success">Success</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ payment.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            No payment details available for this session.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>Raw Data</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded"><code>{{ session.payment_details|tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

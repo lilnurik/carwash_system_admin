@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Edit Program: {{ program.name }}</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <!-- Add CSRF token here -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+            <!-- Program ID Field (readonly) -->
+            <div class="mb-3">
+                <label for="id" class="form-label">Program ID</label>
+                <input type="text" class="form-control" id="id" name="id"
+                       value="{{ program.id }}" readonly>
+                <div class="form-text">ID cannot be changed after creation</div>
+            </div>
+
+            <!-- Program Name Field -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Program Name</label>
+                <input type="text" class="form-control" id="name" name="name"
+                       value="{{ program.name }}" required>
+            </div>
+
+            <!-- Price Field -->
+            <div class="mb-3">
+                <label for="price_per_second" class="form-label">Price per Second</label>
+                <input type="number" class="form-control" id="price_per_second" name="price_per_second"
+                       step="0.01" value="{{ program.price_per_second }}" required>
+            </div>
+
+            <!-- Status Field -->
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
+                       {% if program.is_active %}checked{% endif %}>
+                <label for="is_active" class="form-check-label">Active</label>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('programs.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

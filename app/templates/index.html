@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h1 class="card-title">Welcome to Carwash Management System</h1>
+                        <p class="lead">Manage your carwash devices, programs, and users in one place.</p>
+                        <div class="text-end">
+                            <img src="../static/logo.png" alt="Carwash Logo" style="height: 70px;">
+                        </div>
+                        <hr>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add this to your index.html page -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h5>Total Sessions</h5>
+                        <h2>{{ stats.total_sessions }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5>Total Revenue</h5>
+                        <h2>${{ stats.total_revenue|round(2) }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h5>Avg Session Duration</h5>
+                        <h2>{{ stats.avg_duration|round(0) }} s</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <h5>Last 24 Hours</h5>
+                        <h2>{{ stats.recent_sessions }} sessions</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">System Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="display-4 text-primary">
+                                            <i class="bi bi-people"></i>
+                                        </h1>
+                                        <h5>Users</h5>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{{ url_for('users.index') }}" class="btn btn-primary w-100">
+                                            <i class="bi bi-person-plus"></i> Manage Users
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="display-4 text-success">
+                                            <i class="bi bi-pc-display"></i>
+                                        </h1>
+                                        <h5>Devices</h5>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{{ url_for('devices.index') }}" class="btn btn-success w-100">
+                                            <i class="bi bi-plus-circle"></i> Manage Devices
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="display-4 text-warning">
+                                            <i class="bi bi-gear"></i>
+                                        </h1>
+                                        <h5>Programs</h5>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{{ url_for('programs.index') }}" class="btn btn-warning w-100">
+                                            <i class="bi bi-list"></i> Manage Programs
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">Quick Actions</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            <a href="{{ url_for('users.create') }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">Add New User</h5>
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                                <p class="mb-1">Register a new user with RFID card</p>
+                            </a>
+                            <a href="{{ url_for('devices.create') }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">Add New Device</h5>
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <p class="mb-1">Configure a new carwash device</p>
+                            </a>
+                            <a href="{{ url_for('programs.create') }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">Add New Program</h5>
+                                    <i class="bi bi-plus-square"></i>
+                                </div>
+                                <p class="mb-1">Create a new carwash program</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h4 class="mb-0">System Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+
+                            <tr>
+                                <th scope="row">System Version</th>
+                                <td>v1.0.0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Devices</h1>
+        <a href="{{ url_for('devices.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add New Device
+        </a>
+    </div>
+
+    <!-- Filter & Search controls -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" placeholder="Search devices..."
+                               value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="status" onchange="this.form.submit()">
+                        <option value="" {% if not request.args.get('status') %}selected{% endif %}>All Status</option>
+                        <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.args.get('status') == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="program" onchange="this.form.submit()">
+                        <option value="" {% if not request.args.get('program') %}selected{% endif %}>All Programs</option>
+                        {% for program in all_programs %}
+                        <option value="{{ program.id }}" {% if request.args.get('program') == program.id|string %}selected{% endif %}>
+                            {{ program.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ url_for('devices.index') }}" class="btn btn-outline-secondary w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Devices List -->
+    <div class="card">
+        <div class="card-body">
+            {% if devices %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>IP Address</th>
+                            <th>Port</th>
+                            <th>Programs</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for device in devices %}
+                        <tr>
+                            <td>{{ device.name }}</td>
+                            <td>{{ device.ip_address }}</td>
+                            <td>{{ device.port }}</td>
+                            <td>
+                                {% if device.programs %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for program in device.programs %}
+                                    <li>{{ program.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <span class="text-muted">No programs</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if device.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('devices.edit', id=device.id) }}" class="btn btn-primary">Edit</a>
+
+                                    <!-- Toggle Status Form - ADD CSRF TOKEN -->
+                                    <form action="{{ url_for('devices.toggle_status', id=device.id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-warning">
+                                            {% if device.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+
+                                    <!-- Delete Form - ADD CSRF TOKEN -->
+                                    <form action="{{ url_for('devices.delete', id=device.id) }}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this device? This action cannot be undone.')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No devices found. <a href="{{ url_for('devices.create') }}">Create a new device</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
